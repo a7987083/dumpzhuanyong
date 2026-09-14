@@ -1,53 +1,45 @@
 {
   "project": "dumpzhuanyong",
-  "phase": "stable_floatui_v1",
-  "branch": "main",
-  "stable_ref": "release/v1.0.0",
-  "source_commit": "a152eba94d65811fda6244b9160bbd09e694ab6f",
-  "release": {
-    "version": "v1.0.0",
-    "status": "pending_due_github_actions_backend_startup_failure",
-    "release_branch_created": true,
-    "github_release_created": false
+  "phase": "phase2_adtrace_v2_dev1",
+  "branch": "feature/adtrace-v2",
+  "stable_floatui_ref": "release/v1.0.0",
+  "stable_floatui_source_commit": "a152eba94d65811fda6244b9160bbd09e694ab6f",
+  "skills_used": [
+    "rev-symbol",
+    "rev-ios-dump",
+    "rev-frida"
+  ],
+  "target": {
+    "ipa": "516415ecaa177dbc217b251d8871204e.ipa",
+    "ipa_sha256": "2b81549fc41576bd9d7209240d9210cfc6dac034afd98be3ce8ef3025d73827c",
+    "runner_sha256": "509583df95221e004d97612aa183ea4091ac75e4c6c137d2da56b7051edcf268",
+    "runner_uuid": "79F4AEE2-24AC-3D2F-BA53-BE5669D52212",
+    "runner_cryptid": 0,
+    "runner_min_ios": "13.0",
+    "anythink_sdk_sha256": "d46f1c443f57245055fd4dff43894fc8d7c19be4d38f5cf36c43d712027b6426"
   },
-  "baseline": {
-    "reference_repo": "H5GG/H5GG",
-    "reference_branch": "main",
-    "reference_commit": "b47b56676c89124362bd11aa3aaf95b02c07ca22",
-    "reference_files": [
-      "FloatButton.h",
-      "FloatWindow.h",
-      "makeWindow.h",
-      "Tweak.mm"
-    ]
+  "implementation": {
+    "stable_floatui_modified": false,
+    "adtrace_source_dir": "src/adtrace",
+    "frida_validation_probe": "tools/frida/adtrace_probe.js",
+    "log_path": "Documents/DumpZhuanYong_AdTrace_v2.jsonl",
+    "runtime_hook_strategy": "objc_class_selector_plus_type_encoding_gate",
+    "mutation_policy": "readonly_no_return_patch_no_reward_forge"
   },
   "build": {
-    "status": "pass",
-    "workflow": "build-floatui",
-    "workflow_run_id": 34869124317,
-    "artifact_id": 10357833844,
-    "artifact_name": "DumpZhuanYongFloatUI-v1",
-    "artifact_zip_digest": "sha256:186b3256b547c32d4fe10833d086df081a54ac64a6166d6eaefb5dedaaf83b38",
-    "dylib": "DumpZhuanYongFloatUI.dylib",
-    "dylib_sha256": "db6acd39d41ed176fcd1e0a65eaff7d3d5181c23074d2fab826e0870b45977d4",
-    "mach_o": "arm64 dylib",
-    "platform": "ios",
-    "min_ios": "12.0",
-    "sdk": "26.5",
-    "install_name": "@rpath/DumpZhuanYongFloatUI.dylib"
+    "target": "DumpZhuanYongAdTraceV2.dylib",
+    "status": "pending_ci",
+    "workflow": "build-adtrace-v2",
+    "artifact": "pending"
   },
   "runtime": {
-    "status": "ui_verified_by_user",
-    "device_verified": true,
-    "ui_verified": true,
-    "touch_passthrough_verified": false,
-    "rotation_verified": false,
-    "multi_scene_verified": false
+    "floatui_status": "ui_verified_by_user",
+    "adtrace_v2_status": "not_tested",
+    "cold_start_splash_trace": false,
+    "reward_trace": false,
+    "interstitial_trace": false,
+    "banner_trace": false,
+    "provider_adapter_trace": false
   },
-  "reuse_policy": {
-    "stable_source_dir": "src/float",
-    "business_logic_must_be_added_outside_stable_ui_layer": true,
-    "modify_stable_baseline_only_for_ui_bugfixes": true
-  },
-  "next_task": "reuse_src_float_as_base_for_other_projects"
+  "next_task": "pass_ci_then_inject_v2_and_capture_cold_start_splash_trace"
 }
