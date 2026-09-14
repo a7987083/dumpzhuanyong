@@ -439,13 +439,16 @@ static void DZImageAdded(const struct mach_header *header, intptr_t slide) {
 }
 
 void DZAdTraceInstall(void) {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        DZInstallPass();
+    static dispatch_once_t observerOnceToken;
+    dispatch_once(&observerOnceToken, ^{
         _dyld_register_func_for_add_image(DZImageAdded);
         DZAdTraceRecordEvent(@"system", @"trace.install", @"DZAdTrace", @"install", nil, nil, nil,
                              @{@"version": DZAdTraceVersion});
     });
+
+    // Manual calls (for example the dashboard Rescan button) must really rescan.
+    // The installed-hook set keeps this idempotent, while newly loaded classes can be discovered.
+    DZInstallPass();
 }
 
 __attribute__((constructor)) static void DZAdTraceEntry(void) {
