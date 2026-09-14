@@ -1,0 +1,28 @@
+name: build-adtrace
+
+on:
+  push:
+    branches: [main, 'dev/**', 'feature/**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode version
+        run: xcodebuild -version
+      - name: Build
+        run: make clean all
+      - name: Verify Mach-O
+        run: make verify
+      - name: SHA-256
+        run: shasum -a 256 build/DumpZhuanYongAdTrace.dylib | tee build/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DumpZhuanYongAdTrace-v0.1.0
+          path: |
+            build/DumpZhuanYongAdTrace.dylib
+            build/SHA256SUMS.txt
+          if-no-files-found: error
