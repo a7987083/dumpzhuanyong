@@ -1,4 +1,4 @@
-name: build-floatui
+name: build-adtrace-v2
 
 on:
   push:
@@ -6,42 +6,25 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Xcode version
         run: xcodebuild -version
+      - name: Source checks
+        run: make source-check
       - name: Build
         run: make clean all
       - name: Verify Mach-O
         run: make verify
       - name: SHA-256
-        run: shasum -a 256 build/DumpZhuanYongFloatUI.dylib | tee build/SHA256SUMS.txt
+        run: shasum -a 256 build/DumpZhuanYongAdTraceV2.dylib | tee build/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: DumpZhuanYongFloatUI-v1
+          name: DumpZhuanYongAdTraceV2-dev
           path: |
-            build/DumpZhuanYongFloatUI.dylib
+            build/DumpZhuanYongAdTraceV2.dylib
             build/SHA256SUMS.txt
           if-no-files-found: error
-      - name: Publish stable v1.0.0 release
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view v1.0.0 >/dev/null 2>&1; then
-            echo "v1.0.0 already exists; skip release creation"
-          else
-            gh release create v1.0.0 \
-              build/DumpZhuanYongFloatUI.dylib \
-              build/SHA256SUMS.txt \
-              --target "${GITHUB_SHA}" \
-              --title "DumpZhuanYong FloatUI v1.0.0" \
-              --notes "Reusable H5GG-style iOS floating-window baseline. Includes transparent touch-through UIWindow, draggable floating button, draggable panel, UIWindowScene support, rotation/resize clamping, and no app-specific business hooks. Verified by CI and user device UI test."
