@@ -1,31 +1,25 @@
-# DumpZhuanYong FloatUI
+# DumpZhuanYong FloatUI + AD Trace v2
 
-可复用的 iOS H5GG 风格悬浮窗基线。当前稳定版本只负责 UI 基础层，不包含广告 Trace、Hook、内存修改或其他业务逻辑。
+本仓库把**稳定悬浮窗基础层**和**项目业务层**分开维护。
 
-## Stable baseline
+- Stable FloatUI: `release/v1.0.0`
+- Current development: `feature/adtrace-v2`
+- `src/float/`: 稳定 UI 基线，Phase 2 不修改
+- `src/adtrace/`: 当前目标 App 的只读广告诊断层
 
-- Branch: `main`
-- FloatUI source baseline: `a152eba94d65811fda6244b9160bbd09e694ab6f`
-- H5GG upstream reference: `H5GG/H5GG@b47b56676c89124362bd11aa3aaf95b02c07ca22`
-- Minimum iOS: 12.0
-- Architecture: arm64
+## Stable FloatUI
 
-## 能力
+H5GG 风格 iOS 悬浮窗基础设施：
 
 - 独立透明 `UIWindow`
 - iOS 13+ `UIWindowScene` 绑定
-- 透明区域触摸穿透
-- 52x52 圆形悬浮按钮
-- 按钮拖动并约束在可视区域
-- 点击展开/收起面板
-- 面板拖动
-- 横竖屏 / Scene 尺寸变化适配
-- 周期性置顶
-- 不调用 `makeKeyAndVisible`，不主动抢宿主 keyWindow
+- 非控件区域触摸穿透
+- 52×52 可拖动悬浮按钮
+- 可拖动面板
+- 窗口尺寸变化适配
+- 不调用 `makeKeyAndVisible`
 
-## 复用方式
-
-其他项目优先复用 `src/float/` 目录：
+稳定源码目录：
 
 ```text
 src/float/
@@ -35,11 +29,51 @@ src/float/
   DZFloatBootstrap.m
 ```
 
-业务项目只需要把自己的功能控件、日志、Hook 状态等接到 `DZFloatPanel`，无需重新实现 Window / Scene / 拖动 / 触摸穿透。
+## AD Trace v2
+
+第二阶段在不改 `src/float/` 的前提下新增：
+
+```text
+src/adtrace/
+  DZAdTrace.h
+  DZAdTraceInternal.h
+  DZAdTraceStore.m
+  DZAdTraceHooks.m
+  DZAdTraceDashboard.m
+```
+
+能力：
+
+- Flutter `AnythinkSdkPlugin` call Trace
+- Native -> Flutter callback Trace
+- Splash / Reward / Interstitial / Banner / Native bridge Trace
+- `ATAdManager` / TopOn load/show Trace
+- `ATF*Delegate` callback Trace
+- `AT*Adapter` provider show Trace
+- `placementID` / `sceneID` / provider 证据记录
+- JSONL：`Documents/DumpZhuanYong_AdTrace_v2.jsonl`
+- FloatUI 面板实时显示 hooks/events/最后事件
+
+### 安全边界
+
+v2 是诊断版：
+
+- 不屏蔽广告
+- 不修改返回值
+- 不伪造激励奖励
+- 不 patch 可执行代码
+- 不写死目标 RVA/VA
+
+Runtime Hook 安装前检查 Objective-C type encoding；只有 `void` 返回且显式参数 ABI 可以安全按对象指针处理的方法才安装。
+
+## Optional Frida cross-check
+
+`tools/frida/adtrace_probe.js` 是 Frida 17+ 只读验证脚本，只用 `Process.attachModuleObserver()` + `Interceptor.attach()`，并提供 `rpc.exports.stop()`。
 
 ## Build
 
 ```bash
+make source-check
 make clean all
 make verify
 ```
@@ -47,14 +81,13 @@ make verify
 输出：
 
 ```text
-build/DumpZhuanYongFloatUI.dylib
+build/DumpZhuanYongAdTraceV2.dylib
 ```
 
-## 验证状态
+## Evidence
 
-- GitHub Actions 编译：PASS
-- Mach-O arm64 dylib：PASS
-- iOS min version 12.0：PASS
-- 用户实机 UI 验证：PASS
+目标样本的 SHA-256、Runner UUID、`cryptid`、关键 ObjC 符号地址和 TopOn upstream 交叉验证记录在：
 
-后续项目应把这一版视为稳定 UI 基线；新业务功能在独立分支上开发，避免修改稳定基线。
+`docs/ADTRACE_V2_ANALYSIS.md`
+
+项目进度看 `PROJECT_STATE.json` / `ROADMAP.md` / `HANDOFF.md`。
