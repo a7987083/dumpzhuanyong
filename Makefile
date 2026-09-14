@@ -1,6 +1,6 @@
 SHELL := /bin/bash
-TARGET := DumpZhuanYongAdTrace
-SRC := src/DZTraceCore.m src/DZFloatingUI.m
+TARGET := DumpZhuanYongFloatUI
+SRC := src/float/DZFloatWindow.m src/float/DZFloatButton.m src/float/DZFloatPanel.m src/float/DZFloatBootstrap.m
 BUILD_DIR := build
 OUT := $(BUILD_DIR)/$(TARGET).dylib
 SDK := $(shell xcrun --sdk iphoneos --show-sdk-path 2>/dev/null)
@@ -25,7 +25,7 @@ verify: $(OUT)
 	xcrun otool -hv $(OUT)
 	xcrun otool -L $(OUT)
 	@echo "required strings:"
-	strings $(OUT) | grep -E 'DumpZhuanYong AD Trace|ATFSplashAdManger|ATAdManager|ATFSendSignalManger'
+	strings $(OUT) | grep -E 'DumpZhuanYong FloatUI|H5GG-style floating window baseline|no makeKeyAndVisible'
 
 clean:
 	rm -rf $(BUILD_DIR)
