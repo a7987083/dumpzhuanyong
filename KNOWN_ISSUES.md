@@ -1,22 +1,29 @@
 # KNOWN_ISSUES
 
-## KI-001 — 未实机验证
+## KI-001 — FloatUI 未实机验证
 
 - 状态：OPEN
-- 条件：当前只有静态 IPA 与 Linux 工作环境。
-- 风险：无法确认宿主实际 Scene/Window 生命周期和广告全屏窗口时悬浮层表现。
-- 下一步：注入 v0.1.0 实机冷启动验证。
+- 已完成：源码实现、macOS/Xcode 编译验证。
+- 未完成：真实 IPA 注入、启动、触摸穿透、拖动、旋转、多 Scene 回归。
+- 风险：某些宿主会创建比 `UIWindowLevelAlert - 1` 更高的业务窗口，可能遮挡 FloatUI。
+- 下一步：只注入 FloatUI dylib 实机验证。
 
-## KI-002 — exact branch `hfamapuniversal` 当前不可见
-
-- 状态：DOCUMENTED
-- 现象：当前账号可访问仓库的活动 branch refs 中没有精确名为 `hfamapuniversal` 的分支。
-- 已确认：旧仓库历史中存在 `HFAMapUniversal_*` 产物，并在 `feature/login-ip-tracer-dylib-v2-hfamap187-v1920-menu` 的 `HFAMapLegacy.m` 找到用户描述的 H5GG 风格悬浮按钮/面板实现。
-- 处理：v0.1 固定上述真实 commit 为 UI baseline，不依赖不存在的 ref 名。
-
-## KI-003 — Native show 未纳入 v0.1 hook
+## KI-002 — iPad 分屏/Stage Manager 未验证
 
 - 状态：OPEN
-- 原因：Native show selector 含 `BOOL` 等非对象参数；v0.1 的通用 wrapper 仅处理 object ABI，避免错误调用约定。
-- 当前覆盖：Native load + Flutter callback 仍可记录。
-- 下一步：为 Native show 写精确 ABI wrapper 后再启用。
+- 当前实现：使用当前 `UIWindowScene` bounds，并在尺寸变化时按比例迁移按钮/面板位置后 clamp。
+- 风险：Stage Manager / 外接屏场景可能存在多个 foreground Scene。
+- 下一步：实机收集 Scene/window 状态后决定是否需要 scene affinity 规则。
+
+## KI-003 — 宿主全屏高层级 Window
+
+- 状态：OPEN
+- 当前策略：FloatUI 使用独立 `UIWindow`，level=`UIWindowLevelAlert - 1`，且不抢 keyWindow。
+- 风险：宿主自建更高 level 的全屏窗口可能盖住按钮。
+- 原则：先验证真实目标；没有证据前不提高 level、不 hook UIWindow。
+
+## KI-004 — 旧广告 Trace 源码仍存在于仓库历史/工作树
+
+- 状态：EXPECTED
+- 当前分支 Makefile 只编译 `src/float/*`，旧 Trace 不进入 `DumpZhuanYongFloatUI.dylib`。
+- 后续：Phase 1 完成后再决定如何模块化接回，不在悬浮窗阶段混编。
