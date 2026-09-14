@@ -2,45 +2,71 @@
 
 ## 当前目标
 
-第一阶段只做 iOS 悬浮窗基础设施。不要接广告 Trace、Hook、日志业务，先把窗口生命周期和触摸行为做稳定。
+Phase 2：在稳定 `release/v1.0.0` FloatUI 基线上开发只读广告运行时 Trace。目标是闭合：
+
+`Flutter -> AnyThink bridge -> ATAdManager / TopOn -> Adapter -> Delegate callback -> Flutter callback`。
 
 ## 当前分支
 
 - repo: `a7987083/dumpzhuanyong`
-- branch: `feature/h5gg-floating-window-v1`
+- branch: `feature/adtrace-v2`
+- stable FloatUI: `release/v1.0.0`
 
-## H5GG 官方参考基线
+## 稳定层约束
 
-- repo: `H5GG/H5GG`
-- branch: `main`
-- commit: `b47b56676c89124362bd11aa3aaf95b02c07ca22`
-- files: `FloatButton.h`, `FloatWindow.h`, `makeWindow.h`, `Tweak.mm`
+`src/float/` 不修改。业务通过 `src/adtrace/DZAdTraceDashboard.m` 在运行时找到 `DZFloatPanel` 并覆盖 body 区域；按钮文字通过公开的 `setDisplayText:` 运行时调用改为 `AD`。
+
+## 使用技能
+
+- `rev-symbol`: 用真实 Runner 符号、类、selector 和地址做静态证据，不从单个字符串下结论。
+- `rev-ios-dump`: 重新检查 Mach-O 加密状态和样本身份；当前 Runner `cryptid=0`。
+- `rev-frida`: 采用观察优先、可停止、无 mutation 的动态验证策略，并提供 Frida 17+ probe。
+
+## 目标二进制证据
+
+- IPA SHA-256: `2b81549fc41576bd9d7209240d9210cfc6dac034afd98be3ce8ef3025d73827c`
+- Runner SHA-256: `509583df95221e004d97612aa183ea4091ac75e4c6c137d2da56b7051edcf268`
+- Runner UUID: `79F4AEE2-24AC-3D2F-BA53-BE5669D52212`
+- Runner: arm64, `cryptid=0`, min iOS 13.0
+- AnyThinkSDK SHA-256: `d46f1c443f57245055fd4dff43894fc8d7c19be4d38f5cf36c43d712027b6426`
+
+关键本地符号地址仅作为这个 build 的证据，运行代码不写死：
+
+- `0x1002e0574` `-[AnythinkSdkPlugin handleMethodCall:result:]`
+- `0x1002ee44c` `-[ATFInterstitialManger loadInterstitialAd:extraDic:]`
+- `0x1002fa114` `-[ATFRewardedVideoManger loadRewardedVideo:extraDic:]`
+- `0x1002fc2a0` `-[ATFSendSignalManger sendMethod:arguments:result:]`
+- `0x1002fc474` `-[ATFSplashAdManger loadSplashAd:extraDic:]`
+- `0x1002fcae4` `-[ATFSplashAdManger showSplashAd:]`
+- `0x1002fcc54` `-[ATFSplashAdManger showSplashAd:sceneID:]`
 
 ## 当前实现
 
-- `src/float/DZFloatWindow.*`：独立透明窗口、Scene/宿主窗口查找、非悬浮区域触摸穿透。
-- `src/float/DZFloatButton.*`：52×52 圆形按钮、点击、拖动、边界限制。
-- `src/float/DZFloatPanel.*`：原生面板、标题栏拖动、关闭按钮。
-- `src/float/DZFloatBootstrap.m`：constructor 启动、独立 Window 生命周期、Scene 切换、旋转尺寸变化、持续前置。
-- `Makefile`：只编译上述 FloatUI，不编译旧广告 Trace。
+- `src/adtrace/DZAdTraceStore.m`: event ring + counters + JSONL logger.
+- `src/adtrace/DZAdTraceHooks.m`: ObjC runtime hook engine with ABI gate.
+- `src/adtrace/DZAdTraceDashboard.m`: live dashboard attached to stable FloatUI.
+- `tools/frida/adtrace_probe.js`: independent read-only runtime cross-check.
+- `docs/ADTRACE_V2_ANALYSIS.md`: evidence and design rationale.
 
-## 关键设计约束
+## Hook 安全条件
 
-1. 不调用 `makeKeyAndVisible`。
-2. 不修改宿主 keyWindow/rootViewController。
-3. iOS 13+ 使用 `initWithWindowScene:`。
-4. 透明窗口空白区域必须触摸穿透。
-5. Scene 变化时销毁旧 overlay window 并在新 Scene 重建。
-6. 后续业务必须在悬浮窗实机稳定后再接。
+每个 IMP hook 在安装前必须同时满足：
 
-## 未完成验证
+1. class + selector 实际存在；
+2. 显式参数数量完全匹配；
+3. 返回类型为 `void`；
+4. 所有显式参数 type encoding 是 object/class/SEL pointer-compatible；
+5. 保存原 IMP 并原样调用。
 
-- 实机是否显示按钮。
-- 空白区域是否完全不拦截宿主触摸。
-- 面板开关与拖动。
-- 横竖屏、iPad 分屏/多 Scene。
-- 全屏系统弹窗或宿主高 windowLevel 场景下的层级。
+不满足则跳过。禁止 return patch、广告屏蔽、奖励伪造。
 
-## Next Task
+## 接手顺序
 
-下载 CI 产出的 `DumpZhuanYongFloatUI.dylib`，只注入该 dylib 进行第一轮实机验证。
+1. `git status` / 当前 branch / HEAD。
+2. 看 `PROJECT_STATE.json` 和 `ROADMAP.md`。
+3. 看当前 GitHub Actions 的第一处真实错误；不要根据最后一行猜。
+4. CI 通过后取 `DumpZhuanYongAdTraceV2.dylib` 和 SHA256。
+5. 注入目标 IPA，冷启动一次。
+6. 打开 AD 面板确认 `hooks > 0`，回收 `Documents/DumpZhuanYong_AdTrace_v2.jsonl`。
+7. 用 Frida probe 做一次对照验证（有授权设备时）。
+8. 只在真实日志证明字段稳定后做 provider/session 聚合。
