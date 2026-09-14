@@ -40,9 +40,7 @@
     if (!self.window || self.window.hidden) return;
 
     CGSize size = self.window.bounds.size;
-    if (!CGSizeEqualToSize(size, self.lastWindowSize)) {
-        [self handleLayoutChange:size];
-    }
+    if (!CGSizeEqualToSize(size, self.lastWindowSize)) [self handleLayoutChange:size];
 
     [self.window bringSubviewToFront:self.panel];
     [self.window bringSubviewToFront:self.button];
@@ -65,10 +63,10 @@
 
 - (void)createWindowForScene:(UIWindowScene *)scene {
     UIWindow *host = DZHostWindowForScene(scene);
-    if (!host && @available(iOS 13.0, *)) return;
 
     DZFloatWindow *window = nil;
     if (@available(iOS 13.0, *)) {
+        if (!scene) return;
         window = [[DZFloatWindow alloc] initWithWindowScene:scene];
         self.boundScene = scene;
     } else {
@@ -110,8 +108,8 @@
     self.rootController = root;
     self.lastWindowSize = window.bounds.size;
 
-    // H5GG-style: show the overlay window without makeKeyAndVisible,
-    // so the host application keeps its key window / responder ownership.
+    // Same key-window policy as H5GG: show an overlay UIWindow, but never call
+    // makeKeyAndVisible, so the host app keeps key-window/responder ownership.
     window.hidden = NO;
     [window bringSubviewToFront:panel];
     [window bringSubviewToFront:button];
