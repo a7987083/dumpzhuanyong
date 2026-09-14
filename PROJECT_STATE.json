@@ -2,8 +2,14 @@
   "project": "dumpzhuanyong",
   "phase": "stable_floatui_v1",
   "branch": "main",
+  "stable_ref": "release/v1.0.0",
   "source_commit": "a152eba94d65811fda6244b9160bbd09e694ab6f",
-  "release": "v1.0.0",
+  "release": {
+    "version": "v1.0.0",
+    "status": "pending_due_github_actions_backend_startup_failure",
+    "release_branch_created": true,
+    "github_release_created": false
+  },
   "baseline": {
     "reference_repo": "H5GG/H5GG",
     "reference_branch": "main",
