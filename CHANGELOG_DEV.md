@@ -14,5 +14,8 @@
 
 - 已完成目标 IPA 静态 selector/class 复核。
 - 已完成源码结构检查与 JSON 校验。
-- Linux 当前环境无 iPhoneOS SDK，本地未执行 iOS dylib 编译；以 GitHub Actions macOS 构建结果为准。
+- Linux 当前环境无 iPhoneOS SDK，本地未执行 iOS dylib 编译。
+- GitHub Actions run `34868435986`：Build / Mach-O Verify / SHA-256 / Artifact upload 全部通过。
+- 编译产物：`DumpZhuanYongAdTrace.dylib`，Mach-O arm64 dylib，min iOS 12.0。
+- dylib SHA-256：`050fd1e19c642a061b878b24287ba09062ba1ba04189ddeb978f42aece7f9ca7`。
 - 尚未实机注入/运行。
