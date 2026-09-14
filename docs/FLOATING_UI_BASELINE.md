@@ -1,23 +1,30 @@
 # Floating UI baseline
 
-## 来源
+## 官方参考
 
-复用旧项目 HFAMapUniversal 的 H5GG 风格悬浮层实现思路。当前 GitHub 可访问的对应代码位于：
+第一阶段不再依赖旧 HFAMap 分支，直接以 H5GG 官方仓库为架构参考：
 
-- repo: `a7987083/UnitXP_SP3-Moonstone`
-- ref: `feature/login-ip-tracer-dylib-v2-hfamap187-v1920-menu`
-- commit: `b9c1f48882f41090446f48b7dac1229495524043`
-- file: `hfamap/src/HFAMapLegacy.m`
+- repo: `H5GG/H5GG`
+- branch: `main`
+- verified commit: `b47b56676c89124362bd11aa3aaf95b02c07ca22`
+- files: `FloatButton.h`, `FloatWindow.h`, `makeWindow.h`, `Tweak.mm`
 
-旧实现的关键行为：
+## 从 H5GG 复核出的关键机制
 
-1. 52×52 圆形浮动按钮。
-2. `UIPanGestureRecognizer` 拖动按钮并限制在窗口边界。
-3. 面板自身也支持拖动。
-4. 点击浮动按钮切换面板 hidden 状态。
-5. 周期性寻找当前窗口；窗口变化时把按钮/面板重新挂载。
-6. 每个 tick 对面板和按钮执行 `bringSubviewToFront:`，避免被宿主 UI 覆盖。
+1. 悬浮按钮本身处理拖动，并把位置限制在父窗口范围。
+2. iOS 13+ 新悬浮窗口应通过 `initWithWindowScene:` 绑定前台 `UIWindowScene`；旧系统使用屏幕 bounds 创建。
+3. 悬浮层使用独立 `UIWindow`，而不是长期把所有 UI 强塞进宿主 keyWindow。
+4. 独立窗口不调用 `makeKeyAndVisible`，避免改变宿主 keyWindow 行为。
+5. `UIWindow` 需要做 hit-test/pointInside 过滤，只在悬浮控件区域接收触摸，让窗口其他透明区域穿透。
+6. 悬浮按钮/面板需要持续保持在悬浮窗口内部最前层。
+7. Window/Scene 尺寸变化时要重新约束控件位置。
 
-v0.1 保留以上生命周期与交互模型，但业务内容完全替换为广告 Trace，不带入 HFAMap 的旧扫描/patch 逻辑。
+## 本项目实现差异
 
-> 注：当前仓库列表中没有名为 `hfamapuniversal` 的活动 branch ref；但 `HFAMapUniversal` 产物和上述悬浮 UI 源码都仍可在旧仓库历史分支中验证到，因此以真实可读取 commit 固定基线。
+- 不引入 H5GG 的 `UIWebView` / JavaScriptCore / Html 菜单。
+- 不引入 H5GG 内存搜索引擎。
+- 不引入 GlobalView 跨进程窗口、SpringBoard 或越狱组件。
+- 使用纯 UIKit 原生面板，最小化依赖和崩溃面。
+- 第一阶段 dylib 只编译 `src/float/*`。
+
+目标是先验证稳定的 App 内悬浮窗口基础设施，再在后续阶段挂业务模块。
