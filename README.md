@@ -1,31 +1,43 @@
 # DumpZhuanYong FloatUI
 
-第一阶段只做 iOS 悬浮窗，不接广告 Trace、Hook、日志或其他业务逻辑。
+可复用的 iOS H5GG 风格悬浮窗基线。当前稳定版本只负责 UI 基础层，不包含广告 Trace、Hook、内存修改或其他业务逻辑。
 
-本分支以 H5GG 官方仓库 `H5GG/H5GG` 的悬浮层架构为参考，重新实现一套最小原生版本：
+## Stable baseline
 
-- 独立透明 `UIWindow`，不把面板直接塞进宿主 keyWindow。
-- iOS 13+ 绑定当前前台 `UIWindowScene`。
-- 不调用 `makeKeyAndVisible`，避免抢宿主 key window / responder。
-- 窗口仅在悬浮按钮或面板区域响应触摸；其余区域穿透给宿主 App。
-- 52×52 圆形悬浮按钮，可拖动并限制在屏幕范围内。
-- 点击按钮显示/隐藏面板。
-- 面板标题栏可拖动，至少保留标题区域在屏幕内。
-- 横竖屏/窗口尺寸变化后按比例迁移位置并重新 clamp。
-- 定时 `bringSubviewToFront:`，保持按钮和面板在本悬浮窗口内部最前层。
+- Branch: `main`
+- FloatUI source baseline: `a152eba94d65811fda6244b9160bbd09e694ab6f`
+- H5GG upstream reference: `H5GG/H5GG@b47b56676c89124362bd11aa3aaf95b02c07ca22`
+- Minimum iOS: 12.0
+- Architecture: arm64
 
-## H5GG 参考源码
+## 能力
 
-- `H5GG/H5GG/FloatButton.h`
-- `H5GG/H5GG/FloatWindow.h`
-- `H5GG/H5GG/makeWindow.h`
-- `H5GG/H5GG/Tweak.mm`
+- 独立透明 `UIWindow`
+- iOS 13+ `UIWindowScene` 绑定
+- 透明区域触摸穿透
+- 52x52 圆形悬浮按钮
+- 按钮拖动并约束在可视区域
+- 点击展开/收起面板
+- 面板拖动
+- 横竖屏 / Scene 尺寸变化适配
+- 周期性置顶
+- 不调用 `makeKeyAndVisible`，不主动抢宿主 keyWindow
 
-本项目没有引入 H5GG 的 UIWebView/JavaScriptCore/内存搜索引擎，也没有复制其 GlobalView 跨进程模块；第一阶段只实现 App 内独立悬浮窗口。
+## 复用方式
 
-## 构建
+其他项目优先复用 `src/float/` 目录：
 
-要求 macOS + Xcode iPhoneOS SDK：
+```text
+src/float/
+  DZFloatWindow.h/.m
+  DZFloatButton.h/.m
+  DZFloatPanel.h/.m
+  DZFloatBootstrap.m
+```
+
+业务项目只需要把自己的功能控件、日志、Hook 状态等接到 `DZFloatPanel`，无需重新实现 Window / Scene / 拖动 / 触摸穿透。
+
+## Build
 
 ```bash
 make clean all
@@ -38,4 +50,11 @@ make verify
 build/DumpZhuanYongFloatUI.dylib
 ```
 
-当前开发分支：`feature/h5gg-floating-window-v1`。
+## 验证状态
+
+- GitHub Actions 编译：PASS
+- Mach-O arm64 dylib：PASS
+- iOS min version 12.0：PASS
+- 用户实机 UI 验证：PASS
+
+后续项目应把这一版视为稳定 UI 基线；新业务功能在独立分支上开发，避免修改稳定基线。
