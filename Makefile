@@ -1,12 +1,14 @@
 SHELL := /bin/bash
-TARGET := DumpZhuanYongFloatUI
-SRC := src/float/DZFloatWindow.m src/float/DZFloatButton.m src/float/DZFloatPanel.m src/float/DZFloatBootstrap.m
+TARGET := DumpZhuanYongAdTraceV2
+FLOAT_SRC := src/float/DZFloatWindow.m src/float/DZFloatButton.m src/float/DZFloatPanel.m src/float/DZFloatBootstrap.m
+ADTRACE_SRC := src/adtrace/DZAdTraceStore.m src/adtrace/DZAdTraceHooks.m src/adtrace/DZAdTraceDashboard.m
+SRC := $(FLOAT_SRC) $(ADTRACE_SRC)
 BUILD_DIR := build
 OUT := $(BUILD_DIR)/$(TARGET).dylib
 SDK := $(shell xcrun --sdk iphoneos --show-sdk-path 2>/dev/null)
 CLANG := $(shell xcrun -f clang 2>/dev/null)
 
-.PHONY: all clean verify
+.PHONY: all clean verify source-check
 
 all: $(OUT)
 
@@ -20,12 +22,15 @@ $(OUT): $(SRC)
 		-framework Foundation -framework UIKit -framework QuartzCore \
 		-Wl,-install_name,@rpath/$(TARGET).dylib
 
+source-check:
+	bash scripts/check_source.sh
+
 verify: $(OUT)
 	file $(OUT)
 	xcrun otool -hv $(OUT)
 	xcrun otool -L $(OUT)
 	@echo "required strings:"
-	strings $(OUT) | grep -E 'DumpZhuanYong FloatUI|H5GG-style floating window baseline|no makeKeyAndVisible'
+	strings $(OUT) | grep -E 'AD Trace|DumpZhuanYong_AdTrace_v2.jsonl|AnythinkSdkPlugin|ATFSplashAdManger|ATAdManager|ATFSendSignalManger'
 
 clean:
 	rm -rf $(BUILD_DIR)
