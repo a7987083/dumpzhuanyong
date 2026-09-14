@@ -2,7 +2,6 @@
   "project": "dumpzhuanyong-adtrace",
   "version": "0.1.0",
   "branch": "main",
-  "commit": "HEAD",
   "baseline": {
     "ui_repo": "a7987083/UnitXP_SP3-Moonstone",
     "ui_ref": "feature/login-ip-tracer-dylib-v2-hfamap187-v1920-menu",
@@ -14,10 +13,18 @@
   },
   "build": {
     "local_linux": "not_available_no_iphoneos_sdk",
-    "github_actions": "configured",
+    "github_actions": "pass",
+    "verified_source_commit": "0e73acb72e4b1515f062ac0562c536eced3f16d5",
+    "workflow_run_id": 34868435986,
+    "artifact_id": 10357128932,
+    "artifact_name": "DumpZhuanYongAdTrace-v0.1.0",
+    "artifact_zip_digest": "sha256:4414049e2866f652e01afc500fbf24b84f328a65fd8209c6d39aeec51c5aca7d",
+    "dylib_sha256": "050fd1e19c642a061b878b24287ba09062ba1ba04189ddeb978f42aece7f9ca7",
+    "mach_o": "arm64 dylib",
+    "min_ios": "12.0",
     "artifact": "build/DumpZhuanYongAdTrace.dylib"
   },
-  "ci": "configured_awaiting_first_run",
+  "ci": "pass",
   "runtime": "not_tested",
   "phase": "phase1_v0.1_readonly_trace",
   "next_task": "inject_ci_artifact_and_capture_cold_start_ad_trace"
