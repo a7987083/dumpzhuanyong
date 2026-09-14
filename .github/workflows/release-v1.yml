@@ -1,0 +1,44 @@
+name: release-floatui-v1
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check existing release
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build stable FloatUI
+        if: steps.existing.outputs.exists != 'true'
+        run: make clean all && make verify
+      - name: Create checksums
+        if: steps.existing.outputs.exists != 'true'
+        run: shasum -a 256 build/DumpZhuanYongFloatUI.dylib | tee build/SHA256SUMS.txt
+      - name: Publish v1.0.0
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.0.0 \
+            build/DumpZhuanYongFloatUI.dylib \
+            build/SHA256SUMS.txt \
+            --target "${GITHUB_SHA}" \
+            --title "DumpZhuanYong FloatUI v1.0.0" \
+            --notes "Reusable H5GG-style iOS floating-window baseline. Includes transparent touch-through UIWindow, draggable floating button, draggable panel, UIWindowScene support, rotation/resize clamping, and no app-specific business hooks. Verified by CI and user device UI test."
