@@ -53,7 +53,8 @@ id DZAdTraceSerializableObject(id value, NSUInteger depth) {
         __block NSUInteger count = 0;
         [(NSDictionary *)value enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             if (count++ >= 48) { *stop = YES; return; }
-            NSString *safeKey = DZTruncatedString([[key description] ?: @"<key>" copy], 160);
+            NSString *keyDescription = [key description] ?: @"<key>";
+            NSString *safeKey = DZTruncatedString(keyDescription, 160);
             result[safeKey] = DZAdTraceSerializableObject(obj, depth + 1) ?: [NSNull null];
         }];
         return result;
@@ -140,7 +141,7 @@ void DZAdTraceRecordEvent(NSString *kind,
     if (!DZAdTraceIsEnabled()) return;
     DZEnsureStore();
 
-    NSDictionary *safeDetails = details ? DZAdTraceSerializableObject(details, 0) : nil;
+    id safeDetails = details ? DZAdTraceSerializableObject(details, 0) : nil;
     NSString *safePlacement = placementID ? DZTruncatedString([placementID description] ?: @"", 256) : @"";
     NSString *safeScene = sceneID ? DZTruncatedString([sceneID description] ?: @"", 256) : @"";
     NSString *safeProvider = provider ? DZTruncatedString([provider description] ?: @"", 256) : @"";
