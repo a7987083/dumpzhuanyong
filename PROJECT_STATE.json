@@ -24,13 +24,24 @@
     "frida_validation_probe": "tools/frida/adtrace_probe.js",
     "log_path": "Documents/DumpZhuanYong_AdTrace_v2.jsonl",
     "runtime_hook_strategy": "objc_class_selector_plus_type_encoding_gate",
+    "manual_rescan": "implemented_and_idempotent",
     "mutation_policy": "readonly_no_return_patch_no_reward_forge"
+  },
+  "validation": {
+    "target_static_revalidation": "pass",
+    "floatui_diff_against_release_v1": "no_src_float_changes",
+    "readonly_frida_review": "pass",
+    "objective_c_compile": "not_executed_due_actions_startup_failure_and_no_local_iphoneos_sdk"
   },
   "build": {
     "target": "DumpZhuanYongAdTraceV2.dylib",
-    "status": "pending_ci",
+    "status": "blocked_before_job_creation",
     "workflow": "build-adtrace-v2",
-    "artifact": "pending"
+    "actions_symptom": "BuildFailed_startup_failure_zero_jobs",
+    "affected_run_id": 34872660427,
+    "minimal_probe_run_id": 34872994555,
+    "synthetic_workflow_id": 358008583,
+    "artifact": "not_created"
   },
   "runtime": {
     "floatui_status": "ui_verified_by_user",
@@ -41,5 +52,5 @@
     "banner_trace": false,
     "provider_adapter_trace": false
   },
-  "next_task": "pass_ci_then_inject_v2_and_capture_cold_start_splash_trace"
+  "next_task": "compile_v2_when_actions_dispatch_recovers_then_inject_and_capture_cold_start_splash_trace"
 }
