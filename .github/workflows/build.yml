@@ -1,4 +1,4 @@
-name: build-adtrace
+name: build-floatui
 
 on:
   push:
@@ -18,11 +18,11 @@ jobs:
       - name: Verify Mach-O
         run: make verify
       - name: SHA-256
-        run: shasum -a 256 build/DumpZhuanYongAdTrace.dylib | tee build/SHA256SUMS.txt
+        run: shasum -a 256 build/DumpZhuanYongFloatUI.dylib | tee build/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: DumpZhuanYongAdTrace-v0.1.0
+          name: DumpZhuanYongFloatUI-v1
           path: |
-            build/DumpZhuanYongAdTrace.dylib
+            build/DumpZhuanYongFloatUI.dylib
             build/SHA256SUMS.txt
           if-no-files-found: error
