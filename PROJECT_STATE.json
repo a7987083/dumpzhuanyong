@@ -1,8 +1,9 @@
 {
   "project": "dumpzhuanyong",
-  "phase": "phase1_h5gg_style_floatui_v1",
-  "branch": "feature/h5gg-floating-window-v1",
+  "phase": "stable_floatui_v1",
+  "branch": "main",
   "source_commit": "a152eba94d65811fda6244b9160bbd09e694ab6f",
+  "release": "v1.0.0",
   "baseline": {
     "reference_repo": "H5GG/H5GG",
     "reference_branch": "main",
@@ -30,11 +31,17 @@
     "install_name": "@rpath/DumpZhuanYongFloatUI.dylib"
   },
   "runtime": {
-    "status": "not_tested",
-    "device_verified": false,
+    "status": "ui_verified_by_user",
+    "device_verified": true,
+    "ui_verified": true,
     "touch_passthrough_verified": false,
     "rotation_verified": false,
     "multi_scene_verified": false
   },
-  "next_task": "inject_floatui_only_and_verify_on_device"
+  "reuse_policy": {
+    "stable_source_dir": "src/float",
+    "business_logic_must_be_added_outside_stable_ui_layer": true,
+    "modify_stable_baseline_only_for_ui_bugfixes": true
+  },
+  "next_task": "reuse_src_float_as_base_for_other_projects"
 }
