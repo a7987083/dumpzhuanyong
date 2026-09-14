@@ -1,31 +1,40 @@
 {
-  "project": "dumpzhuanyong-adtrace",
-  "version": "0.1.0",
-  "branch": "main",
+  "project": "dumpzhuanyong",
+  "phase": "phase1_h5gg_style_floatui_v1",
+  "branch": "feature/h5gg-floating-window-v1",
+  "source_commit": "a152eba94d65811fda6244b9160bbd09e694ab6f",
   "baseline": {
-    "ui_repo": "a7987083/UnitXP_SP3-Moonstone",
-    "ui_ref": "feature/login-ip-tracer-dylib-v2-hfamap187-v1920-menu",
-    "ui_commit": "b9c1f48882f41090446f48b7dac1229495524043",
-    "target_ipa": "516415ecaa177dbc217b251d8871204e.ipa",
-    "target_app_version": "1.1.5",
-    "target_build": "17",
-    "target_cryptid": 0
+    "reference_repo": "H5GG/H5GG",
+    "reference_branch": "main",
+    "reference_commit": "b47b56676c89124362bd11aa3aaf95b02c07ca22",
+    "reference_files": [
+      "FloatButton.h",
+      "FloatWindow.h",
+      "makeWindow.h",
+      "Tweak.mm"
+    ]
   },
   "build": {
-    "local_linux": "not_available_no_iphoneos_sdk",
-    "github_actions": "pass",
-    "verified_source_commit": "0e73acb72e4b1515f062ac0562c536eced3f16d5",
-    "workflow_run_id": 34868435986,
-    "artifact_id": 10357128932,
-    "artifact_name": "DumpZhuanYongAdTrace-v0.1.0",
-    "artifact_zip_digest": "sha256:4414049e2866f652e01afc500fbf24b84f328a65fd8209c6d39aeec51c5aca7d",
-    "dylib_sha256": "050fd1e19c642a061b878b24287ba09062ba1ba04189ddeb978f42aece7f9ca7",
+    "status": "pass",
+    "workflow": "build-floatui",
+    "workflow_run_id": 34869124317,
+    "artifact_id": 10357833844,
+    "artifact_name": "DumpZhuanYongFloatUI-v1",
+    "artifact_zip_digest": "sha256:186b3256b547c32d4fe10833d086df081a54ac64a6166d6eaefb5dedaaf83b38",
+    "dylib": "DumpZhuanYongFloatUI.dylib",
+    "dylib_sha256": "db6acd39d41ed176fcd1e0a65eaff7d3d5181c23074d2fab826e0870b45977d4",
     "mach_o": "arm64 dylib",
+    "platform": "ios",
     "min_ios": "12.0",
-    "artifact": "build/DumpZhuanYongAdTrace.dylib"
+    "sdk": "26.5",
+    "install_name": "@rpath/DumpZhuanYongFloatUI.dylib"
   },
-  "ci": "pass",
-  "runtime": "not_tested",
-  "phase": "phase1_v0.1_readonly_trace",
-  "next_task": "inject_ci_artifact_and_capture_cold_start_ad_trace"
+  "runtime": {
+    "status": "not_tested",
+    "device_verified": false,
+    "touch_passthrough_verified": false,
+    "rotation_verified": false,
+    "multi_scene_verified": false
+  },
+  "next_task": "inject_floatui_only_and_verify_on_device"
 }
